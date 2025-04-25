@@ -1,3 +1,5 @@
+[![install-test](https://github.com/microsoft/aoc/actions/workflows/install-test.yml/badge.svg?branch=main)](https://github.com/microsoft/aoc/actions/workflows/install-test.yml)
+
 # Analog-Optical Computer (AOC)
 
 This repo contains the code for the Digital Twin (DT) used in Microsoft Research's AOC project.
