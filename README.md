@@ -1,14 +1,9 @@
-# Project
+# Analog-Optical Computer (AOC)
 
-> This repo has been populated by an initial template to help get you started. Please
-> make sure to update the content to build a great experience for community-building.
+This repo contains the code for the Digital Twin (DT) used in Microsoft Research's AOC project.
+The DT can be used to train fixed-point models to run on either the newer 2300-weight or the 256-weight AOC machines.
 
-As the maintainer of this project, please make a few updates:
-
-- Improving this README.MD file to provide a great experience
-- Updating SUPPORT.MD with content about this project's support experience
-- Understanding the security reporting process in SECURITY.MD
-- Remove this section from the README
+The core of the digital twin is the AOCCell class which attempts to model the physics of the analog-optical device.
 
 ## Contributing
 
