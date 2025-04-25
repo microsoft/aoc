@@ -13,12 +13,12 @@ At its core, AOC implements the following idealized iteration
 which allows it to rapidly evaluate fixed-point models such as Deep-Equilibrium (DEQ) or Hopfield models. The input to the model `x` is reinjected at every iteration in line with the formulation of these models.
 The output is then defined as the fixed-point `z*`.
 
-However, various non-idealities perturb the computation away from the equation above, creating the need for a faithful digital twin through which the models can be trained digitally so that they can be evaluated correctly on AOC. 
+However, various non-idealities perturb the computation in the AOC device away from the equation above, creating the need for a faithful digital twin through which the models can be trained digitally so that they can be evaluated correctly on AOC. 
 
 
 ## Setup
-The package can be installed via `pip install aoc`. It requires python>=3.9 and a torch>=2.0 as well as torchdeq, einops, pyyaml, and pytest.
-Consult the pyproject.toml for details.
+The package can be installed via `pip install aoc`. It requires python>=3.9 and a torch>=2.0 as well as torchdeq, 
+einops, pyyaml, and pytest. Consult the pyproject.toml for details.
 
 ## Functionality
 The core of the digital twin is the `AOCCell` class which attempts to model the physics of the analog-optical device.
@@ -40,12 +40,19 @@ The `MatrixConnectivityType` argument controls the type of the matrix and can be
 2. `Feedforward`, which means that no feedback occurs through the matrix.
 3. `Hopfield`, which ensures a symmetric matrix.
 
+We also provide a more idealized implementation of the hardware operation in the `SimpleCell` class.
+We recommend the constructor wrapper-model factory method `DEQInputOutputProjection.create_simple_cell_model(...)`
+to experiment with this cell type.
+
 ## Hardware Options
 
-The exact hardware configuration is controlled by the abstract `HardwareParameters` class which comes with two child classes: `HardwareParameters16` and `HardwareParameters48` corresponding to the previous and the current AOC hardware generation.
+The exact hardware configuration is controlled by the abstract `HardwareParameters` class which comes with two child classes: 
+`HardwareParameters16` and `HardwareParameters48` corresponding to the previous and the current AOC hardware generation.
 We provide a yaml configuration for each hardware generation in `src/aoc/hw_config`.
 
-`AOCCell` itself offers further options to turn on or off a range of non-idealities. Each non-ideality is attempts to empirically model a particular effect in the hardware that is relevant enough to impact the result of the analog computation. For details on these effects, please consult the paper supplementary section D.
+`AOCCell` itself offers further options to turn on or off a range of non-idealities. Each non-ideality is attempts to 
+empirically model a particular effect in the hardware that is relevant enough to impact the result of the analog computation.
+For details on these effects, please consult the paper supplementary section D.
 
 ## Contributing
 

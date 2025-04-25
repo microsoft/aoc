@@ -166,6 +166,37 @@ class DEQInputOutputProjection(nn.Module):
             n_ensemble=n_ensemble,
         )
 
+    @classmethod
+    def create_simple_cell_model(
+        cls,  # type: ignore
+        d_in: int,
+        d_hidden: List[int],
+        d_out: int,
+        n_ensemble: int = 1,
+    ) -> "DEQInputOutputProjection":
+        """
+        Create a default SimpleCell model with the given parameters.
+        """
+        unit_cell_name = "simplecell"
+        unit_cell_parameters = {
+            "act_func": "tanh",
+            "act_func_first": False,
+        }
+
+        default_config_path = files("aoc.deq_config") / "default.yaml"
+        with open(default_config_path, "r", encoding="UTF-8") as f:
+            deq_parameters = yaml.safe_load(f)
+
+        return cls(
+            d_in=d_in,
+            d_hidden=d_hidden,
+            d_out=d_out,
+            unit_cell_name=unit_cell_name,
+            unit_cell_parameters=unit_cell_parameters,
+            deq_parameters=deq_parameters,
+            n_ensemble=n_ensemble,
+        )
+
     def _create_cell(
         self,
         unit_cell_name: str,

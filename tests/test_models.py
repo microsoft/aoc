@@ -100,3 +100,25 @@ def test_deq_input_output_projection_hopfield():
     )
     test_output.backward()
     assert model.input_projection[0].weight.grad is not None, "Gradients are not None"
+
+
+def test_deq_input_output_simple_cell():
+    """
+    Test the DEQInputOutputProjection class with a SimpleCell structure.
+    This tests tests
+    - input and return shapes
+    - backwardability
+    """
+
+    model = DEQInputOutputProjection.create_simple_cell_model(
+        d_in=1,
+        d_hidden=[24, 24, 24],
+        d_out=1,
+    )
+    test_input = torch.randn(1, 1)
+    test_output, _ = model(test_input)
+    assert test_output.shape == (1, 1), (
+        f"Expected output shape (1, 1), got {test_output.shape}"
+    )
+    test_output.backward()
+    assert model.input_projection[0].weight.grad is not None, "Gradients are not None"
