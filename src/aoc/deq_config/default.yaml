@@ -1,0 +1,13 @@
+solver:
+  f_solver: fixed_point_iter
+  b_solver: fixed_point_iter
+  f_max_iter: 100
+  b_max_iter: 100
+  f_tol: 1e-3
+  b_tol: 1e-3
+  f_stop_mode: rel
+  b_stop_mode: rel
+training:
+  core: sliced
+  ift: True
+  hook_ift: True
