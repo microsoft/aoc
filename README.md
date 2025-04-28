@@ -20,7 +20,7 @@ However, various non-idealities perturb the computation in the AOC device away f
 
 
 ## Setup
-The package can be installed via `pip install aoc`. It requires python>=3.9 and a torch>=2.0 as well as torchdeq, 
+The package can be installed via `pip install aoc`. It requires python>=3.10 and a torch>=2.0 as well as torchdeq, 
 einops, pyyaml, and pytest. Consult the pyproject.toml for details.
 
 ## Functionality
