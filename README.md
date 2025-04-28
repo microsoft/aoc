@@ -1,3 +1,6 @@
+[![install-test](https://github.com/microsoft/aoc/actions/workflows/install-test.yaml/badge.svg?branch=main)](https://github.com/microsoft/aoc/actions/workflows/install-test.yaml)
+[![unit-test](https://github.com/microsoft/aoc/actions/workflows/unit-test.yaml/badge.svg?branch=main)](https://github.com/microsoft/aoc/actions/workflows/unit-test.yaml)
+
 # Analog-Optical Computer (AOC)
 
 This repo contains the code for the Digital Twin (DT) used in Microsoft Research's AOC project.
@@ -17,7 +20,7 @@ However, various non-idealities perturb the computation in the AOC device away f
 
 
 ## Setup
-The package can be installed via `pip install aoc`. It requires python>=3.9 and a torch>=2.0 as well as torchdeq, 
+The package can be installed via `pip install aoc`. It requires python>=3.10 and a torch>=2.0 as well as torchdeq, 
 einops, pyyaml, and pytest. Consult the pyproject.toml for details.
 
 ## Functionality
