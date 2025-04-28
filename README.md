@@ -1,4 +1,5 @@
-[![install-test](https://github.com/microsoft/aoc/actions/workflows/install-test.yml/badge.svg?branch=main)](https://github.com/microsoft/aoc/actions/workflows/install-test.yml)
+[![install-test](https://github.com/microsoft/aoc/actions/workflows/install-test.yaml/badge.svg?branch=main)](https://github.com/microsoft/aoc/actions/workflows/install-test.yaml)
+[![unit-test](https://github.com/microsoft/aoc/actions/workflows/unit-test.yaml/badge.svg?branch=main)](https://github.com/microsoft/aoc/actions/workflows/unit-test.yaml)
 
 # Analog-Optical Computer (AOC)
 
