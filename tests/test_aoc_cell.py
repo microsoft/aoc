@@ -89,7 +89,7 @@ def test_aoc_cell_beta_power_conservation():
     torch.testing.assert_close(unnorm_result, norm_result, atol=1e-6, rtol=1e-6)
 
 
-def test_aoccell_alpha_vector_tanh_mask():
+def test_aoccell_alpha_vector():
     """
     This unit-test makes sure to test alpha as a vector and the tanh mask.
     """
@@ -104,7 +104,6 @@ def test_aoccell_alpha_vector_tanh_mask():
         matrix_structure,
         hw_parameters,
         alpha=torch.tensor([1.0] * n_parameters),
-        apply_tanh_to_indices=[True] * (n_parameters - 1) + [False],
     )
     x = torch.randn(1, n_parameters)
     z = torch.randn(1, n_parameters)
