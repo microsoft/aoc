@@ -17,6 +17,8 @@ from .structured_model import (
     get_structured_model,
 )
 
+from . import training
+
 __all__ = [
     "AOCCell",
     "HardwareParameters",
@@ -33,4 +35,5 @@ __all__ = [
     "SimpleBlock",
     "SimpleCell",
     "DEQInputOutputProjection",
+    "training",
 ]

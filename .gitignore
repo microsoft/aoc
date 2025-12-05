@@ -398,3 +398,38 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+
+# Training data and outputs
+data/
+*.png
+*.jpg
+*.jpeg
+regression_result.png
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+*.egg
+dist/
+build/
+eggs/
+.eggs/
+
+# Jupyter notebooks checkpoints
+.ipynb_checkpoints/
+
+# Model checkpoints and weights
+*.pt
+*.pth
+*.ckpt
+checkpoints/
+
+# Logs
+*.log
+wandb/
+mlruns/
+runs/

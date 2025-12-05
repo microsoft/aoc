@@ -14,6 +14,10 @@ dependencies = [
     "pyaml~=20.4",
     "einops~=0.7",
     "torchdeq==0.1",
+    "torchvision>=0.15",
+    "tqdm>=4.65",
+    "matplotlib>=3.7",
+    "scikit-learn>=1.2",
 ]
 
 [tool.setuptools]
