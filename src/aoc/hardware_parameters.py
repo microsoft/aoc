@@ -281,13 +281,17 @@ class HardwareParameters16(HardwareParameters):
 
 
 def from_config_file(
-    file_path: str = CURRENT_CONFIG,
+    file_path: str = None,
     load_row: int = 12,
     is_16var: bool = False,
 ) -> HardwareParameters:
     """
     Load hardware parameters from config files.
     """
+    # Auto-select config file based on is_16var if not explicitly provided
+    if file_path is None:
+        file_path = LAST_16_VARS_CONFIG if is_16var else CURRENT_CONFIG
+        print(f"Using hardware config: {file_path.name}")
     # open yaml
     with open(file_path, "r", encoding="UTF-8") as file:
         all_coefficients = yaml.safe_load(file)

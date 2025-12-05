@@ -1,25 +1,20 @@
 """
-Example: Train an AOC DEQ model on 1D function regression.
+Example: Train an AOC DEQ model on Fashion MNIST classification.
 
 This script demonstrates how to train a Deep Equilibrium (DEQ) model
-using the AOC digital twin on a 1D function regression task.
+using the AOC digital twin on the Fashion MNIST clothing classification task.
 
-Available regression functions:
-- sinusoidal: x * cos(x) scaled to [-1, 1]
-- sinusoidal2: sqrt(|x|) * sin(3*pi*x)
-- polynomial: 5th order polynomial
-- gaussian: Gaussian function
+Fashion MNIST classes: T-shirt/top, Trouser, Pullover, Dress, Coat,
+Sandal, Shirt, Sneaker, Bag, Ankle boot.
 
 Usage:
-    python examples/train_regression.py --dataset sinusoidal --epochs 50
+    python examples/train_fmnist.py --epochs 20 --lr 3e-4
 
 The training pipeline is ported from AnalogDEQ for reproducibility.
 """
 import argparse
 import torch
 import torch.nn as nn
-import matplotlib.pyplot as plt
-import numpy as np
 
 from aoc import DEQInputOutputProjection
 from aoc.training import (
@@ -29,21 +24,16 @@ from aoc.training import (
     train_epoch,
     eval_epoch,
     ExecutionMode,
-    REGRESSION_DATASETS,
-    get_regression_function,
 )
 
 
 def parse_args():
-    parser = argparse.ArgumentParser(description="Train AOC model on regression")
-    parser.add_argument("--dataset", type=str, default="sinusoidal",
-                       choices=REGRESSION_DATASETS, help="Regression dataset")
-    parser.add_argument("--epochs", type=int, default=50, help="Number of epochs")
-    parser.add_argument("--batch-size", type=int, default=32, help="Batch size")
+    parser = argparse.ArgumentParser(description="Train AOC model on Fashion MNIST")
+    parser.add_argument("--epochs", type=int, default=20, help="Number of epochs")
+    parser.add_argument("--batch-size", type=int, default=64, help="Batch size")
     parser.add_argument("--lr", type=float, default=3e-4, help="Learning rate")
     parser.add_argument("--hidden-size", type=int, default=32, help="Hidden layer size")
     parser.add_argument("--num-layers", type=int, default=1, help="Number of layers (d_hidden will have num_layers+1 elements)")
-    parser.add_argument("--n-points", type=int, default=1000, help="Number of data points")
     parser.add_argument("--device", type=str, default="cuda" if torch.cuda.is_available() else "cpu")
     parser.add_argument("--seed", type=int, default=42, help="Random seed")
     parser.add_argument("--use-aoc-cell", action="store_true", help="Use AOCCell instead of SimpleCell")
@@ -51,39 +41,7 @@ def parse_args():
     parser.add_argument("--fixed-point-init", type=str, default="zeros",
                        choices=["x_proj", "zeros", "random"],
                        help="Fixed point initialization: x_proj, zeros, or random")
-    parser.add_argument("--plot", action="store_true", help="Plot results after training")
     return parser.parse_args()
-
-
-def plot_regression_results(model, dataset_name, device, fixed_point_init="zeros", save_path="regression_result.png"):
-    """Plot the learned function vs ground truth."""
-    model.eval()
-    
-    # Generate dense x values for plotting
-    x = torch.linspace(-1, 1, 200).unsqueeze(1)
-    
-    # Get ground truth
-    func = get_regression_function(dataset_name)
-    y_true = func(x.squeeze())
-    
-    # Get model predictions
-    with torch.no_grad():
-        x_device = x.to(device)
-        y_pred, _ = model(x_device, fixed_point_init=fixed_point_init)
-        y_pred = y_pred.cpu().squeeze()
-    
-    # Plot
-    plt.figure(figsize=(10, 6))
-    plt.plot(x.numpy(), y_true.numpy(), 'b-', label='Ground Truth', linewidth=2)
-    plt.plot(x.numpy(), y_pred.numpy(), 'r--', label='DEQ Prediction', linewidth=2)
-    plt.xlabel('x')
-    plt.ylabel('y')
-    plt.title(f'Regression on {dataset_name} function')
-    plt.legend()
-    plt.grid(True, alpha=0.3)
-    plt.savefig(save_path, dpi=150, bbox_inches='tight')
-    plt.close()
-    print(f"Plot saved to {save_path}")
 
 
 def main():
@@ -98,22 +56,21 @@ def main():
     print(f"Using device: {device}")
     
     # Create data loaders
-    print(f"Loading {args.dataset} regression dataset with {args.n_points} points...")
+    print("Loading Fashion MNIST dataset...")
     train_loader, valid_loader, test_loader = get_data_loader(
-        dataset_name=args.dataset,
+        dataset_name="fashion_mnist",
         batch_size=args.batch_size,
-        batch_size_test=args.n_points,  # Evaluate on all points
+        batch_size_test=256,
         train_valid_split_ratio=0.9,
-        n_points=args.n_points,
     )
-    print(f"Train batches: {len(train_loader)}")
+    print(f"Train batches: {len(train_loader)}, Valid batches: {len(valid_loader)}")
     
     # Create model
-    # Regression: 1 input, 1 output
-    d_in = 1
+    # Fashion MNIST: 28x28 = 784 input features, 10 output classes
+    d_in = 784
     # d_hidden has num_layers+1 elements: [h, h] for 1 layer, [h, h, h] for 2 layers, etc.
     d_hidden = [args.hidden_size] * (args.num_layers + 1)
-    d_out = 1
+    d_out = 10
     
     if args.use_aoc_cell:
         print(f"Creating AOCCell model with {args.num_layers} layer(s), hidden size {args.hidden_size}...")
@@ -144,7 +101,7 @@ def main():
     print(f"\nModel:\n{model}")
     
     # Loss function, optimizer
-    loss_fn = nn.MSELoss()
+    loss_fn = nn.CrossEntropyLoss()
     optimizer = get_optimizer(model, optimizer_name="Adam", lr=args.lr, weight_decay=0)
     
     # Optional: learning rate scheduler
@@ -155,11 +112,13 @@ def main():
     )
     
     # Training loop
-    best_valid_loss = float('inf')
+    best_valid_acc = 0.0
     print(f"\nStarting training for {args.epochs} epochs...")
     print("=" * 60)
     
     for epoch in range(args.epochs):
+        print(f"\nEpoch {epoch + 1}/{args.epochs}")
+        
         # Train
         train_metrics = train_epoch(
             model=model,
@@ -167,12 +126,13 @@ def main():
             loss_fn=loss_fn,
             optimizer=optimizer,
             device=device,
-            task_type="regression",
+            task_type="classification",
             lr_scheduler=scheduler,
             clip_grad_norm=args.clip_grad,
             fixed_point_init=args.fixed_point_init,
-            show_progress=False,
+            show_progress=True,
         )
+        print(f"  Train: {train_metrics}")
         
         # Validate
         valid_metrics = eval_epoch(
@@ -180,22 +140,17 @@ def main():
             data_loader=valid_loader,
             loss_fn=loss_fn,
             device=device,
-            task_type="regression",
+            task_type="classification",
             mode=ExecutionMode.VALID,
             fixed_point_init=args.fixed_point_init,
             show_progress=False,
         )
-        
-        # Print progress every 10 epochs
-        if (epoch + 1) % 10 == 0 or epoch == 0:
-            print(f"Epoch {epoch + 1:3d}/{args.epochs}: "
-                  f"Train MSE={train_metrics.mse_avg:.6f}, "
-                  f"Valid MSE={valid_metrics.mse_avg:.6f}, "
-                  f"Corr={valid_metrics.pearson_corr:.4f}")
+        print(f"  Valid: {valid_metrics}")
         
         # Track best model
-        if valid_metrics.mse_avg < best_valid_loss:
-            best_valid_loss = valid_metrics.mse_avg
+        if valid_metrics.accuracy > best_valid_acc:
+            best_valid_acc = valid_metrics.accuracy
+            print(f"  [New best validation accuracy: {best_valid_acc:.4f}]")
     
     print("\n" + "=" * 60)
     print("Training complete!")
@@ -207,18 +162,20 @@ def main():
         data_loader=test_loader,
         loss_fn=loss_fn,
         device=device,
-        task_type="regression",
+        task_type="classification",
         mode=ExecutionMode.TEST,
         fixed_point_init=args.fixed_point_init,
-        show_progress=False,
+        show_progress=True,
     )
     print(f"Test: {test_metrics}")
-    print(f"\nFinal test MSE: {test_metrics.mse_avg:.6f}")
-    print(f"Final Pearson correlation: {test_metrics.pearson_corr:.4f}")
+    print(f"\nFinal test accuracy: {test_metrics.accuracy:.4f}")
     
-    # Plot results
-    if args.plot:
-        plot_regression_results(model, args.dataset, device, args.fixed_point_init)
+    # Print class info
+    print("\nFashion MNIST classes:")
+    classes = ["T-shirt/top", "Trouser", "Pullover", "Dress", "Coat",
+               "Sandal", "Shirt", "Sneaker", "Bag", "Ankle boot"]
+    for i, c in enumerate(classes):
+        print(f"  {i}: {c}")
 
 
 if __name__ == "__main__":
