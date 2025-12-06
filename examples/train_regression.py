@@ -39,16 +39,16 @@ def parse_args():
     parser.add_argument("--dataset", type=str, default="sinusoidal",
                        choices=REGRESSION_DATASETS, help="Regression dataset")
     parser.add_argument("--epochs", type=int, default=50, help="Number of epochs")
-    parser.add_argument("--batch-size", type=int, default=32, help="Batch size")
-    parser.add_argument("--lr", type=float, default=3e-4, help="Learning rate")
+    parser.add_argument("--batch-size", type=int, default=8, help="Batch size")
+    parser.add_argument("--lr", type=float, default=7e-4, help="Learning rate")
     parser.add_argument("--hidden-size", type=int, default=32, help="Hidden layer size")
     parser.add_argument("--num-layers", type=int, default=1, help="Number of layers (d_hidden will have num_layers+1 elements)")
-    parser.add_argument("--n-points", type=int, default=1000, help="Number of data points")
+    parser.add_argument("--n-points", type=int, default=10000, help="Number of data points")
     parser.add_argument("--device", type=str, default="cuda" if torch.cuda.is_available() else "cpu")
     parser.add_argument("--seed", type=int, default=42, help="Random seed")
     parser.add_argument("--use-aoc-cell", action="store_true", help="Use AOCCell instead of SimpleCell")
     parser.add_argument("--clip-grad", type=float, default=1.0, help="Gradient clipping norm")
-    parser.add_argument("--fixed-point-init", type=str, default="zeros",
+    parser.add_argument("--fixed-point-init", type=str, default="x_proj",
                        choices=["x_proj", "zeros", "random"],
                        help="Fixed point initialization: x_proj, zeros, or random")
     parser.add_argument("--plot", action="store_true", help="Plot results after training")

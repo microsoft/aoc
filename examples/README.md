@@ -69,10 +69,10 @@ Train a DEQ model on 1D function regression. Available datasets:
 
 ```bash
 # With AOCCell hardware simulation:
-python examples/train_regression.py --dataset sinusoidal2 --epochs 500 --hidden-size 16 --use-aoc-cell
+python examples/train_regression.py --dataset sinusoidal2 --epochs 30 --hidden-size 16 --use-aoc-cell
 
 # Generate a plot of results:
-python examples/train_regression.py --dataset gaussian --epochs 500 --hidden-size 16 --use-aoc-cell --plot
+python examples/train_regression.py --dataset gaussian --epochs 30 --hidden-size 16 --use-aoc-cell --plot
 ```
 
 Use `--help` on any script to see all available options.
