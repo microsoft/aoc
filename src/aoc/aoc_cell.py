@@ -3,6 +3,7 @@ AOC Cell implementation.
 """
 
 from logging import getLogger
+import warnings
 from math import sqrt
 from typing import (
     List,
@@ -417,27 +418,30 @@ class AOCCell(nn.Module):
         Construct an AOCCell from parameters.
         This function initializes all nested necessary classes.
 
-        Note: AOCCell requires hardware calibration data which is only available
-        for specific configurations:
-        - Hidden sizes: 16 or 48
-        - layer_sizes must have exactly 2 elements (e.g., [48, 48])
+        Note: AOCCell hardware calibration data is only available for specific
+        configurations (hidden sizes 16 or 48, layer_sizes with 2 elements).
+        Other configurations will work but use the closest available calibration.
         """
-        # Validate hidden size
+
+        # Check hidden size and warn if not supported
         hidden_size = layer_sizes[0]
         if hidden_size not in cls.SUPPORTED_HIDDEN_SIZES:
-            raise ValueError(
-                f"AOCCell only supports hidden sizes {sorted(cls.SUPPORTED_HIDDEN_SIZES)}, "
-                f"but got hidden_size={hidden_size}. "
-                f"Hardware calibration data is not available for other sizes."
+            warnings.warn(
+                f"AOCCell hardware calibration is only available for hidden sizes "
+                f"{sorted(cls.SUPPORTED_HIDDEN_SIZES)}, but got hidden_size={hidden_size}. "
+                f"Using closest available calibration (48-var). "
+                f"Results may not accurately reflect hardware behavior.",
+                UserWarning,
             )
 
-        # Validate layer_sizes length (len=2 means 1 layer, len=3 means 2 layers, etc.)
+        # Check layer_sizes length and warn if not supported
         layer_sizes_len = len(layer_sizes)
         if layer_sizes_len not in cls.SUPPORTED_LAYER_SIZES_LEN:
-            raise ValueError(
-                f"AOCCell requires layer_sizes with exactly 2 elements (e.g., [48, 48] for 1 layer), "
-                f"but got {layer_sizes_len} element(s). "
-                f"Hardware calibration data is not available for other configurations."
+            warnings.warn(
+                f"AOCCell hardware calibration is only available for layer_sizes with "
+                f"2 elements (e.g., [48, 48] for 1 layer), but got {layer_sizes_len} element(s). "
+                f"Using available calibration. Results may not accurately reflect hardware behavior.",
+                UserWarning,
             )
 
         is_16var = layer_sizes[0] == 16 and len(layer_sizes) <= 2

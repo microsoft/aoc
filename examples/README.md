@@ -18,23 +18,22 @@ All scripts support several command-line options to configure training:
 - `--use-aoc-cell` - use AOCCell (hardware digital twin) instead of SimpleCell
 - `--fixed-point-init` - initialization for fixed-point solver: `zeros`, `x_proj`, or `random`
 
-### AOCCell Hardware Constraints
+### AOCCell Hardware Calibration
 
 When using `--use-aoc-cell`, the model uses hardware calibration data from actual hardware. This calibration data is only available for specific configurations:
 
-- **Hidden sizes**: 16 or 48 only
-- **Number of layers**: 1 only (i.e., `layer_sizes=[N, N]` internally)
+- **Hidden sizes**: 16 or 48 (recommended)
+- **Number of layers**: 1 (recommended, i.e., `layer_sizes=[N, N]` internally)
 
-Using other configurations will raise a `ValueError`. For arbitrary hidden sizes or more layers, use the default SimpleCell (without `--use-aoc-cell`).
+Using other configurations will issue a **warning** but still run, using the closest available calibration data. For the most accurate hardware simulation, use the recommended configurations.
 
 ```bash
-# Valid AOCCell configurations:
+# Recommended AOCCell configurations (accurate hardware simulation):
 python examples/train_mnist.py --hidden-size 16 --use-aoc-cell
 python examples/train_mnist.py --hidden-size 48 --use-aoc-cell
 
-# Invalid - will raise ValueError:
-python examples/train_mnist.py --hidden-size 32 --use-aoc-cell  # unsupported size
-python examples/train_mnist.py --hidden-size 48 --num-layers 2 --use-aoc-cell  # only 1 layer supported
+# Other configurations work but may be less accurate:
+python examples/train_mnist.py --hidden-size 32 --use-aoc-cell  # will warn, uses 48-var calibration
 ```
 
 ## MNIST Classification
