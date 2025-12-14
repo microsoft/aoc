@@ -3,6 +3,7 @@ AOC Cell implementation.
 """
 
 from logging import getLogger
+import warnings
 from math import sqrt
 from typing import (
     List,
@@ -390,13 +391,18 @@ class AOCCell(nn.Module):
             hardware_parameters = from_config_file()
         return cls(matrix_structure, hardware_parameters=hardware_parameters)
 
+    # Supported configurations for AOCCell hardware calibration
+    # layer_sizes must have exactly 2 elements (e.g., [48, 48] for a single hidden layer)
+    SUPPORTED_HIDDEN_SIZES = {16, 48}
+    SUPPORTED_LAYER_SIZES_LEN = {2}  # len(layer_sizes)==2 means 1 linear layer (e.g., [48,48] -> Linear(48,48))
+
     @classmethod
     def from_parameters(
         cls,
         layer_sizes: List[int],
         connectivity: MatrixConnectivityType = MatrixConnectivityType.FEEDBACK,
         init_scale: float = 18.6,
-        config_file: str = CURRENT_CONFIG,
+        config_file: Optional[str] = None,
         apply_weight_distortion: bool = True,
         apply_input_efficiencies: bool = True,
         apply_output_efficiencies: bool = True,
@@ -411,7 +417,33 @@ class AOCCell(nn.Module):
         """
         Construct an AOCCell from parameters.
         This function initializes all nested necessary classes.
+
+        Note: AOCCell hardware calibration data is only available for specific
+        configurations (hidden sizes 16 or 48, layer_sizes with 2 elements).
+        Other configurations will work but use the closest available calibration.
         """
+
+        # Check hidden size and warn if not supported
+        hidden_size = layer_sizes[0]
+        if hidden_size not in cls.SUPPORTED_HIDDEN_SIZES:
+            warnings.warn(
+                f"AOCCell hardware calibration is only available for hidden sizes "
+                f"{sorted(cls.SUPPORTED_HIDDEN_SIZES)}, but got hidden_size={hidden_size}. "
+                f"Using closest available calibration (48-var). "
+                f"Results may not accurately reflect hardware behavior.",
+                UserWarning,
+            )
+
+        # Check layer_sizes length and warn if not supported
+        layer_sizes_len = len(layer_sizes)
+        if layer_sizes_len not in cls.SUPPORTED_LAYER_SIZES_LEN:
+            warnings.warn(
+                f"AOCCell hardware calibration is only available for layer_sizes with "
+                f"2 elements (e.g., [48, 48] for 1 layer), but got {layer_sizes_len} element(s). "
+                f"Using available calibration. Results may not accurately reflect hardware behavior.",
+                UserWarning,
+            )
+
         is_16var = layer_sizes[0] == 16 and len(layer_sizes) <= 2
         module = layer_sizes_to_module(layer_sizes)
         matrix_structure = get_structured_model(
